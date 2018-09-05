@@ -1,20 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "main.h"
 
-//int main() {
-//	printf("Hello, World!\n");
-//	return 0;
-//}
-
-typedef struct mp3 {
-	char *name;
-	struct mp3 *next;
-} mp3_t;
-
-struct node {
-	struct mp3 data;
-	struct node *next;
-} *head;
 
 void append(struct mp3 music) {
 	struct node *temp, *right;
@@ -42,6 +29,7 @@ void add(struct mp3 music) {
 	}
 }
 
+
 void addafter(struct mp3 music, int loc) {
 	int i;
 	struct node *temp, *left = NULL, *right = NULL;
@@ -68,6 +56,7 @@ int count() {
 	}
 	return c;
 }
+
 
 void insert(struct mp3 music) {
 	int c = 0;
