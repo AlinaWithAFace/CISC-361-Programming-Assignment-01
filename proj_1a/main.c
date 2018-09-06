@@ -1,13 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <mem.h>
 #include "main.h"
 
+void bufferTest() {
+	char buffer[BUFFERSIZE];
+	printf("Enter a message: \n");
+	while ((fgets(buffer, BUFFERSIZE, stdin) != NULL) & (buffer[0] != '\n')) // empty string ???
+	{
+		getchar();
+		gets(buffer);
+		printf("String is %s", buffer);
+	}
+}
 
-void append(struct mp3 music) {
+void append(struct mp3 *music) {
 	struct node *temp, *right;
 	temp = (struct node *) malloc(sizeof(struct node));
 	temp->data = music;
-	right = head;
+	right = (struct node *) head;
 	while (right->next != NULL)
 		right = right->next;
 	right->next = temp;
@@ -16,7 +27,7 @@ void append(struct mp3 music) {
 }
 
 
-void add(struct mp3 music) {
+void add(struct mp3 *music) {
 	struct node *temp;
 	temp = (struct node *) malloc(sizeof(struct node));
 	temp->data = music;
@@ -29,10 +40,9 @@ void add(struct mp3 music) {
 	}
 }
 
-
-void addafter(struct mp3 music, int loc) {
+void addafter(struct mp3 *music, int loc) {
 	int i;
-	struct node *temp, *left = NULL, *right = NULL;
+	struct node *temp, *left, *right;
 	right = head;
 	for (i = 1; i < loc; i++) {
 		left = right;
@@ -43,22 +53,11 @@ void addafter(struct mp3 music, int loc) {
 	left->next = temp;
 	left = temp;
 	left->next = right;
+	return;
 }
 
 
-int count() {
-	struct node *n;
-	int c = 0;
-	n = head;
-	while (n != NULL) {
-		n = n->next;
-		c++;
-	}
-	return c;
-}
-
-
-void insert(struct mp3 music) {
+void insert(struct mp3 *music) {
 	int c = 0;
 	struct node *temp;
 	temp = head;
@@ -66,7 +65,7 @@ void insert(struct mp3 music) {
 		add(music);
 	} else {
 		while (temp != NULL) {
-			if (temp->data.name < music.name)
+			if (temp->data->title < music->title)
 				c++;
 			temp = temp->next;
 		}
@@ -80,11 +79,11 @@ void insert(struct mp3 music) {
 }
 
 
-int delete(struct mp3 music) {
-	struct node *temp = NULL, *prev = NULL;
+int delete(char *title) {
+	struct node *temp, *prev;
 	temp = head;
 	while (temp != NULL) {
-		if (temp->data.name == music.name) {
+		if (temp->data->title == title) {
 			if (temp == head) {
 				head = temp->next;
 				free(temp);
@@ -109,16 +108,28 @@ void display(struct node *r) {
 		return;
 	}
 	while (r != NULL) {
-		printf("%d ", r->data);
+		//printf("%d ", r->data);
+		printf("\n\"%s\" by %s, %d, %d", r->data->title, r->data->artist, r->data->year, r->data->duration);
 		r = r->next;
 	}
 	printf("\n");
 }
 
 
+int count() {
+	struct node *n;
+	int c = 0;
+	n = head;
+	while (n != NULL) {
+		n = n->next;
+		c++;
+	}
+	return c;
+}
+
 int main() {
 	int i;
-	struct mp3 music;
+	struct mp3 *music;
 	struct node *n;
 	head = NULL;
 	while (1) {
@@ -136,9 +147,43 @@ int main() {
 		} else {
 			switch (i) {
 				case 1:
-					printf("Enter the number to insert : ");
-					scanf("%d", &music);
+					music = malloc(sizeof(struct mp3));
+					printf("Making song...\n");
+					int len;
+
+					getchar();
+					printf("Enter Song Title: \n");
+					char titleBuffer[BUFFERSIZE];
+					if (fgets(titleBuffer, BUFFERSIZE, stdin) != NULL) {
+						len = (int) strlen(titleBuffer);
+						titleBuffer[len - 1] = '\0';
+						music->title = (char *) malloc(len);
+						strcpy(music->title, titleBuffer);
+					}
+
+					printf("Enter the song artist : ");
+					char artistBuffer[BUFFERSIZE];
+					if (fgets(artistBuffer, BUFFERSIZE, stdin) != NULL) {
+						len = (int) strlen(artistBuffer);
+						artistBuffer[len - 1] = '\0';
+						music->artist = (char *) malloc(len);
+						strcpy(music->artist, artistBuffer);
+					}
+
+					printf("Enter the song year then press enter : ");
+					int tempYear = 0;
+					scanf("%d", &tempYear);
+					music->year = tempYear;
+
+					printf("Enter the song duration then press enter : ");
+					int tempDuration = 0;
+					scanf("%d", &tempDuration);
+					music->duration = tempDuration;
+
+
 					insert(music);
+
+
 					break;
 				case 2:
 					if (head == NULL) {
@@ -156,11 +201,17 @@ int main() {
 						printf("List is Empty\n");
 					else {
 						printf("Enter the number to delete : ");
-						scanf("%d", &music);
-						if (delete(music))
-							printf("%d deleted successfully\n", music);
+						char titleToDeleteBuffer[BUFFERSIZE];
+						if (fgets(titleToDeleteBuffer, BUFFERSIZE, stdin) != NULL) {
+							len = (int) strlen(titleToDeleteBuffer);
+							titleToDeleteBuffer[len - 1] = '\0';
+							music->title = (char *) malloc(len);
+							strcpy(music->title, titleToDeleteBuffer);
+						}
+						if (delete(music->title))
+							printf("%s deleted successfully\n", titleToDeleteBuffer);
 						else
-							printf("%d not found in the list\n", music);
+							printf("%s not found in the list\n", titleToDeleteBuffer);
 					}
 					break;
 				case 5:
@@ -171,3 +222,5 @@ int main() {
 		}
 	}
 }
+
+// an empty string terminates the program

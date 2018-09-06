@@ -5,32 +5,20 @@
 #ifndef PROGRAMMING_ASSIGNMENT_01_MAIN_H
 #define PROGRAMMING_ASSIGNMENT_01_MAIN_H
 
+#define BUFFERSIZE 128
 
 typedef struct mp3 {
-	char *name;
-	struct mp3 *next;
+	char *title;
+	char *artist;
+	int year;
+	int duration;
 } mp3_t;
 
 
 struct node {
-	struct mp3 data;
+	struct mp3 *data;
 	struct node *next;
+	struct node *prev;
 } *head;
-
-void append(struct mp3 music);
-
-void add(struct mp3 music);
-
-void addafter(struct mp3 music, int loc);
-
-int count();
-
-void insert(struct mp3 music);
-
-int delete(struct mp3 music);
-
-void display(struct node *r);
-
-int main();
 
 #endif //PROGRAMMING_ASSIGNMENT_01_MAIN_H
