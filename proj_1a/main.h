@@ -21,4 +21,6 @@ struct node {
 	struct node *prev;
 } *head;
 
+//bool debug = TRUE;
+
 #endif //PROGRAMMING_ASSIGNMENT_01_MAIN_H

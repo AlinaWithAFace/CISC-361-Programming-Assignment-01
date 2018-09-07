@@ -3,18 +3,8 @@
 #include <mem.h>
 #include "main.h"
 
-void bufferTest() {
-	char buffer[BUFFERSIZE];
-	printf("Enter a message: \n");
-	while ((fgets(buffer, BUFFERSIZE, stdin) != NULL) & (buffer[0] != '\n')) // empty string ???
-	{
-		getchar();
-		gets(buffer);
-		printf("String is %s", buffer);
-	}
-}
-
 void append(struct mp3 *music) {
+	printf("append");
 	struct node *temp, *right;
 	temp = (struct node *) malloc(sizeof(struct node));
 	temp->data = music;
@@ -22,25 +12,30 @@ void append(struct mp3 *music) {
 	while (right->next != NULL)
 		right = right->next;
 	right->next = temp;
+	temp->prev = right;
 	right = temp;
 	right->next = NULL;
 }
 
 
 void add(struct mp3 *music) {
+	printf("add");
 	struct node *temp;
 	temp = (struct node *) malloc(sizeof(struct node));
 	temp->data = music;
 	if (head == NULL) {
 		head = temp;
 		head->next = NULL;
+		head->prev = NULL;
 	} else {
 		temp->next = head;
+		temp->prev = head->prev;
 		head = temp;
 	}
 }
 
 void addafter(struct mp3 *music, int loc) {
+	printf("addafter");
 	int i;
 	struct node *temp, *left, *right;
 	right = head;
@@ -51,13 +46,14 @@ void addafter(struct mp3 *music, int loc) {
 	temp = (struct node *) malloc(sizeof(struct node));
 	temp->data = music;
 	left->next = temp;
+	right->prev = temp;
 	left = temp;
 	left->next = right;
-	return;
 }
 
 
 void insert(struct mp3 *music) {
+	printf("insert");
 	int c = 0;
 	struct node *temp;
 	temp = head;
@@ -67,6 +63,7 @@ void insert(struct mp3 *music) {
 		while (temp != NULL) {
 			if (temp->data->title < music->title)
 				c++;
+			temp->prev = temp;
 			temp = temp->next;
 		}
 		if (c == 0)
@@ -80,6 +77,7 @@ void insert(struct mp3 *music) {
 
 
 int delete(char *title) {
+	printf("delete");
 	struct node *temp, *prev;
 	temp = head;
 	while (temp != NULL) {
@@ -90,6 +88,7 @@ int delete(char *title) {
 				return 1;
 			} else {
 				prev->next = temp->next;
+				temp->next->prev = temp;
 				free(temp);
 				return 1;
 			}
@@ -108,8 +107,21 @@ void display(struct node *r) {
 		return;
 	}
 	while (r != NULL) {
-		//printf("%d ", r->data);
-		printf("\n\"%s\" by %s, %d, %d", r->data->title, r->data->artist, r->data->year, r->data->duration);
+		printf("\n");
+
+		if (NULL != r->prev) {
+			printf("%s <-", r->prev->data->title);
+		} else {
+			printf("No previous <-");
+		}
+
+		printf("\"%s\" by %s, %d, %d", r->data->title, r->data->artist, r->data->year, r->data->duration);
+
+		if (NULL != r->next) {
+			printf(" -> %s", r->next->data->title);
+		} else {
+			printf("-> No next");
+		}
 		r = r->next;
 	}
 	printf("\n");
